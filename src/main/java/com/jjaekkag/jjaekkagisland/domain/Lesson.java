@@ -26,7 +26,7 @@ public class Lesson extends BaseTimeEntity {
     @Size(min=1, max=50)
     private String name;
 
-    private int limitParticipant;//TODO 20값
+    private int limitParticipant;
 
     @OneToMany(mappedBy = "lesson")
     private List<Reservation> reservations = new ArrayList<>();
