@@ -42,4 +42,9 @@ public class ReservationController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping(path = "/{lessonSeq}")
+    public ResponseEntity<?> getEnrolledMember(@PathVariable @NotNull Long lessonSeq) {
+        return ResponseEntity.ok(reservationService.getEnrolledMemberList(lessonSeq));
+    }
+
 }

@@ -9,11 +9,11 @@ import lombok.Getter;
  */
 @Getter
 public class ReservationResDto {
-    private String storeName;
-    private String address;
-    private String name;
-    private Integer participant;
 
+    private final String storeName;
+    private final String address;
+    private final String name;
+    private final Integer participant;
 
     public ReservationResDto(ReservationResult res) {
         this.storeName = res.getStoreName();

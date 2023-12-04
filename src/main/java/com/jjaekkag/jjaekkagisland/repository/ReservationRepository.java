@@ -33,4 +33,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "JOIN reservation r ON l.lesson_seq = r.lesson_seq " +
             "WHERE r.reservation_seq = :reservationSeq ", nativeQuery = true)
     Optional<ReservationResult> findReservationByReservationSeq(@Param("reservationSeq") Long reservationSeq);
+
+    @Query(value = "SELECT r FROM Reservation r " +
+            "join fetch r.member m " +
+            "where r.lesson.lessonSeq = :lessonSeq " +
+            "and r.cancelYn = false " +
+            "order by r.createdDateTime ")
+    List<Reservation> findEnrolledMemberListByLessonSeq(@Param("lessonSeq") Long lessonSeq);
 }

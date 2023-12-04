@@ -5,6 +5,7 @@ import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Member;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
 import com.jjaekkag.jjaekkagisland.domain.ReservationStatus;
+import com.jjaekkag.jjaekkagisland.domain.dto.EnrolledMemberResDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationResDto;
 import com.jjaekkag.jjaekkagisland.repository.ReservationRepository;
@@ -89,5 +90,12 @@ public class ReservationService {
         }
         reservation.updateCancelYn(true);
         reservationRepository.save(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EnrolledMemberResDto> getEnrolledMemberList(Long lessonSeq) {
+        return reservationRepository.findEnrolledMemberListByLessonSeq(lessonSeq)
+                .stream().map(EnrolledMemberResDto::new)
+                .toList();
     }
 }

@@ -3,6 +3,7 @@ package com.jjaekkag.jjaekkagisland.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  * @author jeongheekim
  * @date 12/2/23
  */
+@Getter
 @Entity
 public class Member extends BaseTimeEntity {
 
