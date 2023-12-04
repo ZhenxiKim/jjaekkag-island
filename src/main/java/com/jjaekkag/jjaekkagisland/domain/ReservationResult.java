@@ -2,7 +2,7 @@ package com.jjaekkag.jjaekkagisland.domain;
 
 /**
  * @author jeongheekim
- * @date 12/4/23
+ * 발@date 12/4/23
  */
 public interface ReservationResult {
     String getAddress();
