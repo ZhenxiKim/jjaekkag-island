@@ -5,5 +5,5 @@ package com.jjaekkag.jjaekkagisland.domain;
  * @date 12/3/23
  */
 public enum ReservationStatus {
-    SUCCESS, CANCEL
+    CANCEL, RESERVATION
 }

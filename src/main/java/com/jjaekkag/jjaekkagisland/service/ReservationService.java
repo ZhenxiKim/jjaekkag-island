@@ -5,9 +5,7 @@ import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Member;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
 import com.jjaekkag.jjaekkagisland.domain.ReservationStatus;
-import com.jjaekkag.jjaekkagisland.domain.dto.EnrolledMemberResDto;
-import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
-import com.jjaekkag.jjaekkagisland.domain.dto.ReservationResDto;
+import com.jjaekkag.jjaekkagisland.domain.dto.*;
 import com.jjaekkag.jjaekkagisland.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author jeongheekim
@@ -29,7 +28,7 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class ReservationService {
+public class ReservationService implements ReservationCommon<ReservationReqDto> {
 
     private static final long AVAIL_BEFORE_DAYS = 14;
     private static final long CANCEL_AVAIL_HOUR = 1;
@@ -38,12 +37,13 @@ public class ReservationService {
     private final MemberService memberService;
 
     @Transactional
-    public Long reservation(ReservationReqDto dto, Long memberSeq) {
+    public ReservationCommmonResDto reservation(ReservationReqDto dto, Long memberSeq) {
         Lesson lesson = lessonService.getLesson(dto.lessonSeq());
         checkOverLimitParticipant(dto);
         checkAlreadyBookedLesson(dto, memberSeq);
         checkOverLessonDate(lesson);
-        return createReservation(memberSeq, lesson, dto);
+        Long reservationSeq = createReservation(memberSeq, lesson, dto);
+        return new ReservationCommmonResDto(memberSeq, reservationSeq, lesson.getLessonSeq());
     }
 
     private void checkOverLessonDate(Lesson lesson) {
@@ -62,6 +62,7 @@ public class ReservationService {
     private void checkAlreadyBookedLesson(ReservationReqDto dto, Long memberSeq) {
         Optional<Reservation> reservation = reservationRepository.findAllByLessonSeqAndMemberSeq(dto.lessonSeq(), memberSeq);
         if (reservation.isPresent()) {
+            log.error("이미 예약된 내역이 있습니다.");
             throw new AlreadyBookedException("이미 예약된 내역이 있습니다.");
         }
     }
@@ -69,9 +70,11 @@ public class ReservationService {
 
     private void checkOverLimitParticipant(ReservationReqDto dto) {
         Lesson lesson = lessonService.getLesson(dto.lessonSeq());
-        List<Reservation> reservationList = reservationRepository.findReservationLessonsByLessonSeq(dto.lessonSeq(), ReservationStatus.SUCCESS);
-        boolean isOver = reservationList.size() + dto.participant() >= lesson.getLimitParticipant();
+        List<Reservation> reservationList = reservationRepository.findReservationLessonsByLessonSeq(dto.lessonSeq(), ReservationStatus.RESERVATION);
+        int limitParticipant = lesson.getLimitParticipant();
+        boolean isOver = reservationList.size() + dto.participant() >= limitParticipant;
         if (isOver) {
+            log.error("신청 가능한 인원({})을 초과하였습니다.", limitParticipant);
             throw new ParticipantLimitOverException("신청 가능한 인원을 초과하였습니다.");
         }
     }
@@ -81,15 +84,25 @@ public class ReservationService {
                 .stream().map(ReservationResDto::new).findFirst().orElseThrow(EntityNotFoundException::new);
     }
 
-    public void cancelLesson(Long reservationSeq) {
+
+    public ReservationCommmonResDto cancelLesson(Long reservationSeq, Long memberSeq) {
         Reservation reservation = reservationRepository.findById(reservationSeq).orElseThrow(DataNotFoundException::new);
-        Duration duration = Duration.between(reservation.getLesson().getStartTime(), LocalDateTime.now()).abs();
+        Lesson lesson = reservation.getLesson();
+        checkAvailCancelLesson(lesson);
+        reservation.updateCancelYn(true);
+        reservation.updateResultStatus(ReservationStatus.CANCEL);
+        reservationRepository.save(reservation);
+        return new ReservationCommmonResDto(memberSeq, reservationSeq, lesson.getLessonSeq());
+    }
+
+    private static void checkAvailCancelLesson(Lesson lesson) {
+        Duration duration = Duration.between(lesson.getStartTime(), LocalDateTime.now()).abs();
         long hours = duration.toHours();
         if (hours < CANCEL_AVAIL_HOUR) {
-            throw new LessonCancelNotAvailException(CANCEL_AVAIL_HOUR + "시간 전에는 수업 취소가 불가합니다.");
+            String errMsg = CANCEL_AVAIL_HOUR + "시간 전에는 수업 취소가 불가합니다.";
+            log.error(errMsg);
+            throw new LessonCancelNotAvailException(errMsg);
         }
-        reservation.updateCancelYn(true);
-        reservationRepository.save(reservation);
     }
 
     @Transactional(readOnly = true)
@@ -97,5 +110,11 @@ public class ReservationService {
         return reservationRepository.findEnrolledMemberListByLessonSeq(lessonSeq)
                 .stream().map(EnrolledMemberResDto::new)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationHistoryDto> getReservationHistory(Long lessonSeq) {
+        return reservationRepository.findReservationLogByLessonSeq(lessonSeq)
+                .stream().map(ReservationHistoryDto::new).collect(Collectors.toList());
     }
 }

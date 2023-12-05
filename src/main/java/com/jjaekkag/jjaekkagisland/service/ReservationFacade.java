@@ -1,5 +1,6 @@
 package com.jjaekkag.jjaekkagisland.service;
 
+import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommmonResDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
 import com.jjaekkag.jjaekkagisland.repository.LockRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,15 @@ public class ReservationFacade {
         String lessonSeqVal = String.valueOf(dto.lessonSeq());
         Long reservationSeq = null;
         try {
+            log.info("Get Lock Success!! : {}", lessonSeqVal);
             lockRepository.getLock(lessonSeqVal);
-            reservationSeq = reservationService.reservation(dto, memberSeq);
+            ReservationCommmonResDto reservation = reservationService.reservation(dto, memberSeq);
+            reservationSeq = reservation.getReservationSeq();
         } catch (Exception e) {
             log.error("Reservation Fail : {}", e.getMessage());
         } finally {
             lockRepository.releaseLock(String.valueOf(lessonSeqVal));
+            log.info("Release Lock Success!! : {}", lessonSeqVal);
         }
         return reservationSeq;
     }

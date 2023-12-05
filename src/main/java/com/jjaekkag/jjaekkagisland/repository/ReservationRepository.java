@@ -40,4 +40,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "and r.cancelYn = false " +
             "order by r.createdDateTime ")
     List<Reservation> findEnrolledMemberListByLessonSeq(@Param("lessonSeq") Long lessonSeq);
+
+    @Query("select r from Reservation r " +
+            "join fetch r.member m " +
+            "where r.lesson.lessonSeq = :lessonSeq " +
+            "order by r.updatedDateTime ")
+    List<Reservation> findReservationLogByLessonSeq(Long lessonSeq);
 }

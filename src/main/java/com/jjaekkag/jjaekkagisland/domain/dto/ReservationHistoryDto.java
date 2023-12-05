@@ -14,22 +14,26 @@ import java.time.LocalDateTime;
  */
 @RequiredArgsConstructor
 @Getter
-public class EnrolledMemberResDto {
+public class ReservationHistoryDto {
 
-    private final String email;
+    private String name;
 
-    private final String name;
+    private int participant;
 
-    private final int participant;
+    private String cancel;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private final LocalDateTime reservationDate;
+    private LocalDateTime reservationDate;
 
-    public EnrolledMemberResDto (Reservation reservation) {
+    public ReservationHistoryDto(Reservation reservation) {
         Member member = reservation.getMember();
-        this.email = member.getEmail();
         this.name = member.getName();
         this.participant = reservation.getParticipant();
+        if (reservation.isCancelYn()) {
+            this.cancel = "예약 취소";
+        }
         this.reservationDate = reservation.getCreatedDateTime();
     }
+
+
 }

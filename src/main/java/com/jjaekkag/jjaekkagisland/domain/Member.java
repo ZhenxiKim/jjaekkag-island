@@ -19,12 +19,14 @@ public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberSeq;
+
     @Size(min = 10, max = 20)
     @Column(unique = true)
     private String email;
 
     @Size(min = 1, max = 20)
     private String name;
+
     @Size(min = 10, max = 60)
     private String password;
 

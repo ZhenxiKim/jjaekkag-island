@@ -14,7 +14,6 @@ import org.hibernate.annotations.ColumnDefault;
 @NoArgsConstructor
 @Entity
 @Getter
-@Setter
 public class Reservation extends BaseTimeEntity {
 
     @Id
@@ -42,7 +41,7 @@ public class Reservation extends BaseTimeEntity {
     public Reservation(Lesson lesson, Member member, int participant) {
         this.member = member;
         this.lesson = lesson;
-        this.reservationStatus = ReservationStatus.SUCCESS;
+        this.reservationStatus = ReservationStatus.RESERVATION;
         this.participant = participant;
     }
 
@@ -50,4 +49,7 @@ public class Reservation extends BaseTimeEntity {
         this.cancelYn = cancel;
     }
 
+    public void updateResultStatus(ReservationStatus status) {
+        this.reservationStatus = status;
+    }
 }

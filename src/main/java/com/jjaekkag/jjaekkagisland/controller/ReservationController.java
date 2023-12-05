@@ -2,7 +2,9 @@ package com.jjaekkag.jjaekkagisland.controller;
 
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
 import com.jjaekkag.jjaekkagisland.service.ReservationFacade;
+import com.jjaekkag.jjaekkagisland.service.ReservationLogService;
 import com.jjaekkag.jjaekkagisland.service.ReservationService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,10 @@ import static com.jjaekkag.jjaekkagisland.controller.IndexController.INDEX_URI;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationLogService reservationLogService;
     private final ReservationFacade reservationFacade;
 
+    @Operation(summary = "매장별, 수업별 예약 API", description = "로그인 후 token 획득 후 예약 가능")
     @PostMapping
     public ResponseEntity<Object> reservation(@RequestBody @Valid ReservationReqDto dto, Long memberSeq) {
         Long reservationSeq = reservationFacade.reservation(dto, memberSeq);
@@ -36,15 +40,22 @@ public class ReservationController {
                 .body(reservationService.getReservation(reservationSeq));
     }
 
+    @Operation(summary = "매장별, 수업별 예약 API", description = "로그인 후 token 획득 후 취소 가능")
     @PutMapping(path = "/{reservationSeq}")
-    public ResponseEntity<?> cancel(@PathVariable @NotNull Long reservationSeq) {
-        reservationService.cancelLesson(reservationSeq);
+    public ResponseEntity<?> cancel(@PathVariable @NotNull Long reservationSeq,Long memberSeq) {
+        reservationService.cancelLesson(reservationSeq, memberSeq);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/{lessonSeq}")
+    @Operation(summary = "매장별, 수업별 예약자 현황 API", description = "admin 계정 로그인 후 예약자 현황 조회 가능")
     public ResponseEntity<?> getEnrolledMember(@PathVariable @NotNull Long lessonSeq) {
         return ResponseEntity.ok(reservationService.getEnrolledMemberList(lessonSeq));
+    }
+    @Operation(summary = "매장별, 수업별 예약 이력 현황 API", description = "로그인 후 token 획득 후 취소 가능")
+    @GetMapping(path = "/history/{lessonSeq}")
+    public ResponseEntity<?> getReservationHistory(@PathVariable @NotNull Long lessonSeq) {
+        return ResponseEntity.ok(reservationLogService.getLog(lessonSeq));
     }
 
 }
