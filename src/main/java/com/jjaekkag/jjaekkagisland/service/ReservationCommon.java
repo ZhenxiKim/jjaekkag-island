@@ -1,12 +1,12 @@
 package com.jjaekkag.jjaekkagisland.service;
 
-import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommmonResDto;
+import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommonResDto;
 
 /**
  * @author jeongheekim
  * @date 12/4/23
  */
 public interface ReservationCommon<T> {
-    ReservationCommmonResDto reservation(T dto, Long memberSeq);
-    ReservationCommmonResDto cancelLesson(Long seq,Long memberSeq);
+    ReservationCommonResDto reservation(T dto, Long memberSeq);
+    ReservationCommonResDto cancelLesson(Long seq, Long memberSeq);
 }

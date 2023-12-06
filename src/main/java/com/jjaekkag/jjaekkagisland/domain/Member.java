@@ -1,6 +1,5 @@
 package com.jjaekkag.jjaekkagisland.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -34,7 +33,6 @@ public class Member extends BaseTimeEntity {
     @Size(min = 10, max = 1000)
     private String password;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "member")
     private List<Reservation> reservations = new ArrayList<>();
 

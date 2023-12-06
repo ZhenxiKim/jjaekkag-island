@@ -1,11 +1,14 @@
 package com.jjaekkag.jjaekkagisland.service;
 
-import com.jjaekkag.jjaekkagisland.common.exception.*;
 import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Member;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
 import com.jjaekkag.jjaekkagisland.domain.ReservationStatus;
-import com.jjaekkag.jjaekkagisland.domain.dto.*;
+import com.jjaekkag.jjaekkagisland.domain.dto.EnrolledMemberResDto;
+import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommonResDto;
+import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
+import com.jjaekkag.jjaekkagisland.domain.dto.ReservationResDto;
+import com.jjaekkag.jjaekkagisland.common.exception.*;
 import com.jjaekkag.jjaekkagisland.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +20,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author jeongheekim
@@ -37,13 +38,12 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
     private final MemberService memberService;
 
     @Transactional
-    public ReservationCommmonResDto reservation(ReservationReqDto dto, Long memberSeq) {
+    public ReservationCommonResDto reservation(ReservationReqDto dto, Long memberSeq) {
         Lesson lesson = lessonService.getLesson(dto.lessonSeq());
+        checkOverLessonDate(lesson);
         checkOverLimitParticipant(dto);
         checkAlreadyBookedLesson(dto, memberSeq);
-        checkOverLessonDate(lesson);
-        Long reservationSeq = createReservation(memberSeq, lesson, dto);
-        return new ReservationCommmonResDto(memberSeq, reservationSeq, lesson.getLessonSeq());
+        return new ReservationCommonResDto(createReservation(memberSeq, lesson, dto));
     }
 
     private void checkOverLessonDate(Lesson lesson) {
@@ -53,18 +53,12 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
         }
     }
 
-    private Long createReservation(Long memberSeq, Lesson lesson, ReservationReqDto dto) {
-        Member member = memberService.getMember(memberSeq);
-        Reservation reservation = reservationRepository.save(new Reservation(lesson, member, dto.participant()));
-        return reservation.getReservationSeq();
-    }
-
     private void checkAlreadyBookedLesson(ReservationReqDto dto, Long memberSeq) {
-        Optional<Reservation> reservation = reservationRepository.findAllByLessonSeqAndMemberSeq(dto.lessonSeq(), memberSeq);
-        if (reservation.isPresent()) {
-            log.error("이미 예약된 내역이 있습니다.");
-            throw new AlreadyBookedException("이미 예약된 내역이 있습니다.");
-        }
+        reservationRepository.findAllByLessonSeqAndMemberSeq(dto.lessonSeq(), memberSeq)
+                .ifPresent(reservation -> {
+                    log.error("이미 예약된 내역이 있습니다.");
+                    throw new AlreadyBookedException("이미 예약된 내역이 있습니다.");
+                });
     }
 
 
@@ -79,20 +73,24 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
         }
     }
 
+    private Reservation createReservation(Long memberSeq, Lesson lesson, ReservationReqDto dto) {
+        Member member = memberService.getMember(memberSeq);
+        return reservationRepository.save(new Reservation(lesson, member, dto.participant()));
+    }
+
     public ReservationResDto getReservation(Long reservationSeq) {
         return reservationRepository.findReservationByReservationSeq(reservationSeq)
                 .stream().map(ReservationResDto::new).findFirst().orElseThrow(EntityNotFoundException::new);
     }
 
 
-    public ReservationCommmonResDto cancelLesson(Long reservationSeq, Long memberSeq) {
+    public ReservationCommonResDto cancelLesson(Long reservationSeq, Long memberSeq) {
         Reservation reservation = reservationRepository.findById(reservationSeq).orElseThrow(DataNotFoundException::new);
         Lesson lesson = reservation.getLesson();
         checkAvailCancelLesson(lesson);
         reservation.updateCancelYn(true);
         reservation.updateResultStatus(ReservationStatus.CANCEL);
-        reservationRepository.save(reservation);
-        return new ReservationCommmonResDto(memberSeq, reservationSeq, lesson.getLessonSeq());
+        return new ReservationCommonResDto(reservationRepository.save(reservation));
     }
 
     private static void checkAvailCancelLesson(Lesson lesson) {
@@ -110,11 +108,5 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
         return reservationRepository.findEnrolledMemberListByLessonSeq(lessonSeq)
                 .stream().map(EnrolledMemberResDto::new)
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ReservationHistoryDto> getReservationHistory(Long lessonSeq) {
-        return reservationRepository.findReservationLogByLessonSeq(lessonSeq)
-                .stream().map(ReservationHistoryDto::new).collect(Collectors.toList());
     }
 }

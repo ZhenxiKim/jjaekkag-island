@@ -2,7 +2,7 @@ package com.jjaekkag.jjaekkagisland.common.aop;
 
 import com.jjaekkag.jjaekkagisland.domain.ReservationLog;
 import com.jjaekkag.jjaekkagisland.domain.ReservationStatus;
-import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommmonResDto;
+import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommonResDto;
 import com.jjaekkag.jjaekkagisland.service.ReservationLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class AopComponent {
             status = ReservationStatus.CANCEL;
         }
 
-        ReservationCommmonResDto dto = (ReservationCommmonResDto) returnObj;
+        ReservationCommonResDto dto = (ReservationCommonResDto) returnObj;
         reservationLogService.insertLog(new ReservationLog(dto.getMemberSeq(), dto.getReservationSeq(), dto.getLessonSeq(), status));
     }
 }

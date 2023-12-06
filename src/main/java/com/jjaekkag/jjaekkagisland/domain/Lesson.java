@@ -1,6 +1,5 @@
 package com.jjaekkag.jjaekkagisland.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,7 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class Lesson extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lessonSeq;
 
-    @NotNull(message = "NotNull 필드 입니다.")
+    @NotNull(message = "수업명은 NotNull 필드 입니다.")
     @Size(min=1, max=50)
     private String name;
 
@@ -35,12 +35,18 @@ public class Lesson extends BaseTimeEntity {
     @OneToMany(mappedBy = "lesson")
     private List<Reservation> reservations = new ArrayList<>();
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "store_seq")
     private Store store;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    @NotNull(message = "수업 시작일은 NotNull 필드 입니다.")
+    private LocalDate startDate;
+
+    @NotNull(message = "수업 종료일은 NotNull 필드 입니다.")
+    private LocalDate endDate;
+
+    private LocalTime startTime;
+
+    private LocalTime endTime;
 
 }

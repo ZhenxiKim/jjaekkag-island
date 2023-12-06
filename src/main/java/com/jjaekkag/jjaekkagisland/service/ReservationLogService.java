@@ -27,6 +27,7 @@ public class ReservationLogService {
         reservationLogRepository.save(log);
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationLogResDto> getLog(Long lessonSeq) {
         return reservationLogRepository.findAllByLessonSeq(lessonSeq)
                 .stream().map(ReservationLogResDto::new).collect(Collectors.toList());

@@ -1,7 +1,8 @@
 package com.jjaekkag.jjaekkagisland.service;
 
-import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommmonResDto;
+import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommonResDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
+import com.jjaekkag.jjaekkagisland.common.exception.ReservationFailException;
 import com.jjaekkag.jjaekkagisland.repository.LockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,11 @@ public class ReservationFacade {
         try {
             log.info("Get Lock Success!! : {}", lessonSeqVal);
             lockRepository.getLock(lessonSeqVal);
-            ReservationCommmonResDto reservation = reservationService.reservation(dto, memberSeq);
+            ReservationCommonResDto reservation = reservationService.reservation(dto, memberSeq);
             reservationSeq = reservation.getReservationSeq();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Reservation Fail : {}", e.getMessage());
+            throw new ReservationFailException(e);
         } finally {
             lockRepository.releaseLock(String.valueOf(lessonSeqVal));
             log.info("Release Lock Success!! : {}", lessonSeqVal);

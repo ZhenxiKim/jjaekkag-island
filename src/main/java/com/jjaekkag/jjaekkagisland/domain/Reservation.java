@@ -1,11 +1,10 @@
 package com.jjaekkag.jjaekkagisland.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 /**
@@ -22,13 +21,11 @@ public class Reservation extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationSeq;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "member_seq")
     private Member member;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "lesson_seq")
     private Lesson lesson;
 
@@ -40,6 +37,7 @@ public class Reservation extends BaseTimeEntity {
     @ColumnDefault("false")
     private boolean cancelYn;
 
+    @Builder
     public Reservation(Lesson lesson, Member member, int participant) {
         this.member = member;
         this.lesson = lesson;
