@@ -2,6 +2,7 @@ package com.jjaekkag.jjaekkagisland.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +12,10 @@ import org.hibernate.annotations.ColumnDefault;
  * @author jeongheekim
  * @date 12/3/23
  */
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
+@Table(name = "reservation")
 public class Reservation extends BaseTimeEntity {
 
     @Id

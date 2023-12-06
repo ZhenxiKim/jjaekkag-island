@@ -28,8 +28,8 @@ import static com.jjaekkag.jjaekkagisland.controller.IndexController.INDEX_URI;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final ReservationLogService reservationLogService;
     private final ReservationFacade reservationFacade;
+    private final ReservationLogService reservationLogService;
 
     @Operation(summary = "매장별, 수업별 예약 API", description = "로그인 후 token 획득 후 예약 가능")
     @PostMapping
@@ -40,7 +40,7 @@ public class ReservationController {
                 .body(reservationService.getReservation(reservationSeq));
     }
 
-    @Operation(summary = "매장별, 수업별 예약 API", description = "로그인 후 token 획득 후 취소 가능")
+    @Operation(summary = "매장별, 수업별 예약 취소 API", description = "로그인 후 token 획득 후 취소 가능")
     @PutMapping(path = "/{reservationSeq}")
     public ResponseEntity<?> cancel(@PathVariable @NotNull Long reservationSeq,Long memberSeq) {
         reservationService.cancelLesson(reservationSeq, memberSeq);
@@ -52,10 +52,10 @@ public class ReservationController {
     public ResponseEntity<?> getEnrolledMember(@PathVariable @NotNull Long lessonSeq) {
         return ResponseEntity.ok(reservationService.getEnrolledMemberList(lessonSeq));
     }
+
     @Operation(summary = "매장별, 수업별 예약 이력 현황 API", description = "로그인 후 token 획득 후 취소 가능")
     @GetMapping(path = "/history/{lessonSeq}")
     public ResponseEntity<?> getReservationHistory(@PathVariable @NotNull Long lessonSeq) {
         return ResponseEntity.ok(reservationLogService.getLog(lessonSeq));
     }
-
 }

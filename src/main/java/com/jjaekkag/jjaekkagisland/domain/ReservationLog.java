@@ -1,6 +1,7 @@
 package com.jjaekkag.jjaekkagisland.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,9 +9,10 @@ import lombok.NoArgsConstructor;
  * @author jeongheekim
  * @date 12/4/23
  */
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
+@Table(name = "reservation_log")
 public class ReservationLog extends BaseTimeEntity {
 
     @Id

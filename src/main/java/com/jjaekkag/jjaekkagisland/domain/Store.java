@@ -2,6 +2,8 @@ package com.jjaekkag.jjaekkagisland.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
  * @date 12/2/23
  */
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "store")
 public class Store extends BaseTimeEntity {
 
     @Id
