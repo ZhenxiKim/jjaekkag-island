@@ -21,4 +21,4 @@ http://localhost:8080/swagger-ui/index.html
 
 --- 
 https://www.erdcloud.com/d/oFTaQMHjonNxM6Fy4
-![jjaekkag_island_erd.png](..%2F..%2FDownloads%2Fjjaekkag_island_erd.png)
+![jjaekkag_island_erd](https://github.com/ZhenxiKim/jjaekkag-island/assets/45592236/de8130a7-a148-4393-892a-bc604d63ffb3)
