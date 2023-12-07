@@ -1,8 +1,8 @@
 package com.jjaekkag.jjaekkagisland.service;
 
+import com.jjaekkag.jjaekkagisland.common.exception.ReservationFailException;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommonResDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
-import com.jjaekkag.jjaekkagisland.common.exception.ReservationFailException;
 import com.jjaekkag.jjaekkagisland.repository.LockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

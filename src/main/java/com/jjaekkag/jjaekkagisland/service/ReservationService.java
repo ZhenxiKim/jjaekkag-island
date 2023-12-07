@@ -1,5 +1,6 @@
 package com.jjaekkag.jjaekkagisland.service;
 
+import com.jjaekkag.jjaekkagisland.common.exception.*;
 import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Member;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
@@ -8,7 +9,6 @@ import com.jjaekkag.jjaekkagisland.domain.dto.EnrolledMemberResDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationCommonResDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationReqDto;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationResDto;
-import com.jjaekkag.jjaekkagisland.common.exception.*;
 import com.jjaekkag.jjaekkagisland.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author jeongheekim

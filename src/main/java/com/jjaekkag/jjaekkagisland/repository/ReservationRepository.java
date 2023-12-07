@@ -1,6 +1,9 @@
 package com.jjaekkag.jjaekkagisland.repository;
 
-import com.jjaekkag.jjaekkagisland.domain.*;
+import com.jjaekkag.jjaekkagisland.domain.Lesson;
+import com.jjaekkag.jjaekkagisland.domain.Member;
+import com.jjaekkag.jjaekkagisland.domain.Reservation;
+import com.jjaekkag.jjaekkagisland.domain.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

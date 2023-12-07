@@ -3,8 +3,6 @@ package com.jjaekkag.jjaekkagisland.domain.dto;
 import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Member;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
-import com.jjaekkag.jjaekkagisland.domain.ReservationStatus;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.time.LocalDate;

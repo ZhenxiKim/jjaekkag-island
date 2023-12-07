@@ -3,7 +3,6 @@ package com.jjaekkag.jjaekkagisland.domain.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
-import com.jjaekkag.jjaekkagisland.domain.ReservationResult;
 import lombok.Getter;
 
 import java.time.LocalDate;

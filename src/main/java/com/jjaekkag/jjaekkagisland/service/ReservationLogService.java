@@ -1,7 +1,6 @@
 package com.jjaekkag.jjaekkagisland.service;
 
 import com.jjaekkag.jjaekkagisland.common.exception.DataNotFoundException;
-import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
 import com.jjaekkag.jjaekkagisland.domain.ReservationLog;
 import com.jjaekkag.jjaekkagisland.domain.dto.ReservationLogResDto;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
