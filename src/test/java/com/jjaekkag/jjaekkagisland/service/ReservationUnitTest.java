@@ -3,6 +3,7 @@ package com.jjaekkag.jjaekkagisland.service;
 import com.jjaekkag.jjaekkagisland.domain.Lesson;
 import com.jjaekkag.jjaekkagisland.domain.Member;
 import com.jjaekkag.jjaekkagisland.domain.Reservation;
+import com.jjaekkag.jjaekkagisland.domain.ReservationStatus;
 import com.jjaekkag.jjaekkagisland.domain.dto.EnrolledMemberResDto;
 import com.jjaekkag.jjaekkagisland.repository.ReservationRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -27,8 +28,8 @@ import static org.mockito.Mockito.when;
 public class ReservationUnitTest {
     @Mock
     private ReservationRepository reservationRepository;
-
-
+    @Mock
+    private LessonService lessonService;
     @InjectMocks
     private ReservationService reservationService;
 
@@ -44,7 +45,8 @@ public class ReservationUnitTest {
                 .lesson(lesson)
                 .participant(2)
                 .build();
-        when(reservationRepository.findEnrolledMemberListByLessonSeq(lessonSeq))
+        when(lessonService.getLesson(lessonSeq)).thenReturn(lesson);
+        when(reservationRepository.findReservationByLessonAndReservationStatus(lesson, ReservationStatus.RESERVATION))
                 .thenReturn(Arrays.asList(reservation));
 
         List<EnrolledMemberResDto> enrolledMemberList = reservationService.getEnrolledMemberList(lessonSeq);
