@@ -18,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jeongheekim
@@ -34,6 +36,7 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
     private static final long AVAIL_BEFORE_DAYS = 14;
     private static final long CANCEL_AVAIL_HOUR = 1;
     private final ReservationRepository reservationRepository;
+
     private final LessonService lessonService;
     private final MemberService memberService;
 
@@ -47,14 +50,17 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
     }
 
     private void checkOverLessonDate(Lesson lesson) {
-        long between = ChronoUnit.DAYS.between(lesson.getStartTime(), LocalDateTime.now());
+        LocalDateTime lessonDateTime = LocalDateTime.of(lesson.getStartDate(), lesson.getStartTime());
+        long between = Math.abs(ChronoUnit.DAYS.between(lessonDateTime, LocalDateTime.now()));
         if (between > AVAIL_BEFORE_DAYS) {
             throw new ReservationNotYetAvailableException("아직 예매 가능한 날짜가 아닙니다.");
         }
     }
 
     private void checkAlreadyBookedLesson(ReservationReqDto dto, Long memberSeq) {
-        reservationRepository.findAllByLessonSeqAndMemberSeq(dto.lessonSeq(), memberSeq)
+        Member member = memberService.getMember(memberSeq);
+        Lesson lesson = lessonService.getLesson(dto.lessonSeq());
+        reservationRepository.findReservationByLessonAndMember(lesson, member)
                 .ifPresent(reservation -> {
                     log.error("이미 예약된 내역이 있습니다.");
                     throw new AlreadyBookedException("이미 예약된 내역이 있습니다.");
@@ -64,7 +70,7 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
 
     private void checkOverLimitParticipant(ReservationReqDto dto) {
         Lesson lesson = lessonService.getLesson(dto.lessonSeq());
-        List<Reservation> reservationList = reservationRepository.findReservationLessonsByLessonSeq(dto.lessonSeq(), ReservationStatus.RESERVATION);
+        List<Reservation> reservationList = reservationRepository.findReservationByLessonAndReservationStatus(lesson, ReservationStatus.RESERVATION);
         int limitParticipant = lesson.getLimitParticipant();
         boolean isOver = reservationList.size() + dto.participant() >= limitParticipant;
         if (isOver) {
@@ -79,7 +85,7 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
     }
 
     public ReservationResDto getReservation(Long reservationSeq) {
-        return reservationRepository.findReservationByReservationSeq(reservationSeq)
+        return reservationRepository.findById(reservationSeq)
                 .stream().map(ReservationResDto::new).findFirst().orElseThrow(EntityNotFoundException::new);
     }
 
@@ -88,8 +94,8 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
         Reservation reservation = reservationRepository.findById(reservationSeq).orElseThrow(DataNotFoundException::new);
         Lesson lesson = reservation.getLesson();
         checkAvailCancelLesson(lesson);
-        reservation.updateCancelYn(true);
         reservation.updateResultStatus(ReservationStatus.CANCEL);
+        reservation.updateCancelDateTime();
         return new ReservationCommonResDto(reservationRepository.save(reservation));
     }
 
@@ -105,7 +111,8 @@ public class ReservationService implements ReservationCommon<ReservationReqDto> 
 
     @Transactional(readOnly = true)
     public List<EnrolledMemberResDto> getEnrolledMemberList(Long lessonSeq) {
-        return reservationRepository.findEnrolledMemberListByLessonSeq(lessonSeq)
+        Lesson lesson = lessonService.getLesson(lessonSeq);
+        return reservationRepository.findReservationByLessonAndReservationStatus(lesson, ReservationStatus.RESERVATION)
                 .stream().map(EnrolledMemberResDto::new)
                 .toList();
     }

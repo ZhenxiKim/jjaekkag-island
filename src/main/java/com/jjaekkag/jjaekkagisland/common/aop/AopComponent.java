@@ -41,6 +41,6 @@ public class AopComponent {
         }
 
         ReservationCommonResDto dto = (ReservationCommonResDto) returnObj;
-        reservationLogService.insertLog(new ReservationLog(dto.getMemberSeq(), dto.getReservationSeq(), dto.getLessonSeq(), status));
+        reservationLogService.insertLog(new ReservationLog(dto, status));
     }
 }
